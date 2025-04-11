@@ -38,9 +38,9 @@ public class SecuritConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions().disable()) 
                 .authorizeHttpRequests(
-                        req->req.requestMatchers("/auth/**","/h2-console/**","/v3/api-docs","/swagger-ui.html")	
+                        req->req.requestMatchers("/api/v1/auth/**","/h2-console/**","/v3/api-docs","/swagger-ui.html")	
                                 .permitAll()
-                                .requestMatchers("/admin_only/**").hasAuthority("ADMIN")
+                                .requestMatchers("/admin/**").hasAuthority("ADMIN")
                                 .anyRequest()
                                 .authenticated()
                 ).userDetailsService(userDetailsImp)
