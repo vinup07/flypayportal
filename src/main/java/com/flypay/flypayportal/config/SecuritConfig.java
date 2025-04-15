@@ -28,6 +28,8 @@ public class SecuritConfig {
     private UserDetailsImp userDetailsImp;
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+    
+    private String API_URL = "/api/v1/auth";
 
     @Autowired
     private LogoutHandler logoutHandler;
@@ -38,7 +40,7 @@ public class SecuritConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions().disable()) 
                 .authorizeHttpRequests(
-                        req->req.requestMatchers("/api/v1/auth/**","/h2-console/**","/v3/api-docs","/swagger-ui.html")	
+                        req->req.requestMatchers(API_URL+"/**","/h2-console/**","/v3/api-docs/**","/swagger-ui.html","/swagger-ui/**")	
                                 .permitAll()
                                 .requestMatchers("/admin/**").hasAuthority("ADMIN")
                                 .anyRequest()
@@ -53,7 +55,7 @@ public class SecuritConfig {
                                 )
                                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .logout(l->l
-                        .logoutUrl("/logout")
+                        .logoutUrl(API_URL+"/logout")
                         .addLogoutHandler(logoutHandler)
                         .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()
                         ))

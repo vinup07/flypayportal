@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.flypay.flypayportal.model.AuthenticationResponse;
+import com.flypay.flypayportal.model.LoginRequest;
+import com.flypay.flypayportal.model.RegisterRequest;
 import com.flypay.flypayportal.model.Token;
 import com.flypay.flypayportal.model.User;
 import com.flypay.flypayportal.repository.TokenRepository;
@@ -36,8 +38,12 @@ public class AuthenticationService {
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthenticationResponse register(User request) {
+    public AuthenticationResponse register(RegisterRequest loginRequest) {
 
+    	User request = new User();
+    	request.setUsername(loginRequest.getEmail());
+    	request.setPassword(loginRequest.getPassword());
+    	request.setRole(loginRequest.getRole());
         // check if user already exist. if exist than authenticate the user
         if(repository.findByUsername(request.getUsername()).isPresent()) {
             return new AuthenticationResponse(null, "User already exist");
@@ -60,7 +66,11 @@ public class AuthenticationService {
 
     }
 
-    public AuthenticationResponse authenticate(User request) {
+    public AuthenticationResponse authenticate(LoginRequest loginRequest) {
+    	User request = new User();
+    	request.setUsername(loginRequest.getEmail());
+    	request.setPassword(loginRequest.getPassword());
+    	
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),

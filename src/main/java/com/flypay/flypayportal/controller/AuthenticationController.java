@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.flypay.flypayportal.model.AuthenticationResponse;
-import com.flypay.flypayportal.model.User;
+import com.flypay.flypayportal.model.LoginRequest;
+import com.flypay.flypayportal.model.RegisterRequest;
 import com.flypay.flypayportal.service.impl.AuthenticationService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
 @RestController
@@ -21,14 +23,15 @@ public class AuthenticationController {
     private AuthenticationService authService;
     @PostMapping("register")
     public ResponseEntity<AuthenticationResponse> register(
-           @Valid  @RequestBody User request
+           @Valid  @RequestBody RegisterRequest request
     ) {
         return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("login")
+    @Operation(summary = "Login", description = "Authenticate user and return a JWT token")
     public ResponseEntity<AuthenticationResponse> login(
-         @Valid  @RequestBody User request
+         @Valid  @RequestBody LoginRequest request
     ) {
         return ResponseEntity.ok(authService.authenticate(request));
     }
