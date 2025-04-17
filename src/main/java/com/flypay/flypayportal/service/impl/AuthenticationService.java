@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.flypay.flypayportal.ExceptionHandler.UserAlreadyExistsException;
 import com.flypay.flypayportal.model.AuthenticationResponse;
 import com.flypay.flypayportal.model.LoginRequest;
 import com.flypay.flypayportal.model.RegisterRequest;
@@ -46,7 +47,7 @@ public class AuthenticationService {
     	request.setRole(loginRequest.getRole());
         // check if user already exist. if exist than authenticate the user
         if(repository.findByUsername(request.getUsername()).isPresent()) {
-            return new AuthenticationResponse(null, "User already exist");
+            throw new UserAlreadyExistsException("User already exists with email: " + request.getUsername());
         }
 
         User user = new User();

@@ -15,11 +15,20 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class JwtService {
     private final String SECRET_KEY = "bc0c23f9a10eb1e89824186287d8d20cfdc33bcd93c3cc4d92c9d404714686da";
     private final TokenRepository tokenRepository;
+    
+    public String extractJwtFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7); // remove "Bearer "
+        }
+        return null;
+    }
 
     public JwtService(TokenRepository tokenRepository) {
         this.tokenRepository = tokenRepository;
