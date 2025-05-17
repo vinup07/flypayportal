@@ -1,5 +1,8 @@
 name: Build and Push to ACR
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -29,7 +32,6 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
-
 
     - name: Azure CLI Setup
       uses: azure/CLI@v1
