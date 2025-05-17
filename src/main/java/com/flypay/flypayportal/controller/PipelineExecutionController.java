@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -18,6 +19,13 @@ import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 @RestController
 @RequestMapping("/api/v1/execution")
 public class PipelineExecutionController {
@@ -25,21 +33,42 @@ public class PipelineExecutionController {
     private String azureProject="Fintechpaymentservices";
     
 
-    @PostMapping("/trigger")
-    public ResponseEntity<String> triggerPipeline(@RequestParam String pipelineId, @RequestBody JsonNode parameters) {
-        String azurePipelineUrl = "https://dev.azure.com/"+ azureOrg +"/"+azureProject+"/_apis/pipelines/" + pipelineId + "/runs?api-version=6.0-preview.1";
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json");
-        headers.add("Authorization", "Basic OjJIUWFhMFE2bUVIcVNZQUwwdUZXWFJkdUFqdGZ5b0dqSkFScHBVN1dsMFU1TTJTZXJhV1VKUVFKOTlCREFDQUFBQUFKUWJrMEFBQVNBWkRPd1paRg==");
-    
-        RestTemplate restTemplate = new RestTemplate();
-        HttpEntity<JsonNode> requestEntity = new HttpEntity<>(parameters, headers);
-        ResponseEntity<String> response = restTemplate.postForEntity(azurePipelineUrl,requestEntity, String.class);
+    @PostMapping(value = "/trigger", consumes = {"multipart/form-data"})
+    @Operation(summary = "Trigger Azure Pipeline", description = "Triggers an Azure pipeline with optional file upload.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Pipeline triggered successfully"),
+        @ApiResponse(responseCode = "500", description = "Failed to process the uploaded file", content = @Content)
+    })
+    public ResponseEntity<String> triggerPipeline(
+            @RequestParam String pipelineId,
+            @RequestBody JsonNode parameters,
+            @RequestPart(required = false) @Parameter(description = "File to upload") MultipartFile file) {
+        try {
+            // If a file is uploaded, process it
+            if (file != null && !file.isEmpty()) {
+                String tempDir = System.getProperty("java.io.tmpdir");
+                String filePath = tempDir + "/" + file.getOriginalFilename();
+                file.transferTo(new File(filePath));
+                System.out.println("File uploaded successfully: " + filePath);
+            }
 
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return ResponseEntity.ok("Pipeline triggered successfully!");
-        } else {
-            return ResponseEntity.status(response.getStatusCode()).body("Failed to trigger pipeline.");
+            // Trigger the Azure pipeline
+            String azurePipelineUrl = "https://dev.azure.com/" + azureOrg + "/" + azureProject + "/_apis/pipelines/" + pipelineId + "/runs?api-version=6.0-preview.1";
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Type", "application/json");
+            headers.add("Authorization", "Basic OjJIUWFhMFE2bUVIcVNZQUwwdUZXWFJkdUFqdGZ5b0dqSkFScHBVN1dsMFU1TTJTZXJhV1VKUVFKOTlCREFDQUFBQUFKUWJrMEFBQVNBWkRPd1paRg==");
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<JsonNode> requestEntity = new HttpEntity<>(parameters, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(azurePipelineUrl, requestEntity, String.class);
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return ResponseEntity.ok("Pipeline triggered successfully!");
+            } else {
+                return ResponseEntity.status(response.getStatusCode()).body("Failed to trigger pipeline.");
+            }
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to process the uploaded file.");
         }
     }
 
