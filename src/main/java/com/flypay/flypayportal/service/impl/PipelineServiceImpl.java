@@ -76,7 +76,7 @@ public class PipelineServiceImpl implements PipelineService {
         String azurePipelineUrl = "https://dev.azure.com/"+ azureOrg +"/"+azureProject+"/_apis/pipelines/" + pipelineId + "/runs?api-version=6.0-preview.1";
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
-        headers.add("Authorization", "Basic OjJIUWFhMFE2bUVIcVNZQUwwdUZXWFJkdUFqdGZ5b0dqSkFScHBVN1dsMFU1TTJTZXJhV1VKUVFKOTlCREFDQUFBQUFKUWJrMEFBQVNBWkRPd1paRg==");
+        headers.add("Authorization", "Basic Ojk0U1pzSEpJUmlXTVZaSnRsem5tVlMzcTRLbHJJVDVNSElRU0tsM1R2M2J3T1hFRldkVnRKUVFKOTlCRkFDQUFBQUFKUWJrMEFBQVNBWkRPMWU5cg==");
     
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<JsonNode> requestEntity = new HttpEntity<>(parameters, headers);
