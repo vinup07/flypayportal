@@ -19,13 +19,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @RestController
-@RequestMapping("/api/v1/execution")
+@RequestMapping("/api/v1/")
 public class PipelineExecutionController {
     private String azureOrg="colesgroup";
     private String azureProject="Fintechpaymentservices";
     
 
-    @PostMapping("/trigger")
+    @PostMapping("execution/trigger")
     public ResponseEntity<String> triggerPipeline(@RequestParam String pipelineId, @RequestBody JsonNode parameters) {
         String azurePipelineUrl = "https://dev.azure.com/"+ azureOrg +"/"+azureProject+"/_apis/pipelines/" + pipelineId + "/runs?api-version=6.0-preview.1";
         HttpHeaders headers = new HttpHeaders();
@@ -35,7 +35,7 @@ public class PipelineExecutionController {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<JsonNode> requestEntity = new HttpEntity<>(parameters, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(azurePipelineUrl,requestEntity, String.class);
-
+        
         if (response.getStatusCode() == HttpStatus.OK) {
             return ResponseEntity.ok("Pipeline triggered successfully!");
         } else {
@@ -43,7 +43,7 @@ public class PipelineExecutionController {
         }
     }
 
-    @GetMapping("/status")
+    @GetMapping("execution/status")
     public ResponseEntity<String> getPipelineStatus(@RequestParam String runId) {
         String azurePipelineStatusUrl = "https://dev.azure.com/your-org/your-project/_apis/runs/" + runId + "?api-version=6.0-preview.1";
         RestTemplate restTemplate = new RestTemplate();
@@ -56,7 +56,7 @@ public class PipelineExecutionController {
         }
     }
 
-    @GetMapping("/artifacts")
+    @GetMapping("execution/artifacts")
     public ResponseEntity<String> downloadArtifacts(@RequestParam String runId) {
         String artifactsUrl = "https://dev.azure.com/your-org/your-project/_apis/runs/" + runId + "/artifacts?api-version=6.0-preview.1";
         RestTemplate restTemplate = new RestTemplate();
