@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class Audit {
 
-	LocalDateTime createdAt;
+	LocalDateTime createdAt = LocalDateTime.now();
 	
-	LocalDateTime updatedAt;
+	LocalDateTime updatedAt = LocalDateTime.now();
 	
 }

@@ -1,6 +1,6 @@
 package com.flypay.flypayportal.model;
 
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -20,12 +21,13 @@ public class PipelineParameter {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private Long id;
 
     private String paramKey;
     private String paramValue;
 
     @ManyToOne
     @JoinColumn(name = "pipeline_id", nullable = false)
+    @JsonBackReference
     private Pipeline pipeline;
 }
